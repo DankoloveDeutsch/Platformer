@@ -21,9 +21,14 @@ public:
 	virtual void DrawHUD() override;
 
 	virtual void BeginPlay() override;
+
 	UPROPERTY(EditAnywhere, Category = "Health")
 	TSubclassOf<class UUserWidget> HUDWidgetClass;
+
+	UFUNCTION()
 	UUserWidget* GetWidget();
+	
+	UFUNCTION()
 	void RemoveWidget();
 
 	UPROPERTY(EditAnywhere, Category = "Health")

@@ -17,20 +17,15 @@ ATrapWind::ATrapWind()
     WindDirection = FVector(1.0f, 0.0f, 0.0f);
     ChangeCooldown = 2.0f;
 
-    UStaticMesh* SM_Vase = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(), NULL, TEXT("/Game/LevelPrototyping/Meshes/Title")));
+    UStaticMesh* TrapWind = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(), NULL, TEXT("/Game/LevelPrototyping/Meshes/Title")));
 
     StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
-    StaticMeshComponent->SetStaticMesh(SM_Vase);
+    StaticMeshComponent->SetStaticMesh(TrapWind);
     StaticMeshComponent->SetMaterial(0, NormalMaterial);
     StaticMeshComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 
     StaticMeshComponent->OnComponentBeginOverlap.AddDynamic(this, &ATrapWind::OnTrapOverlap);
     StaticMeshComponent->OnComponentEndOverlap.AddDynamic(this, &ATrapWind::OnTrapEndOverlap);
-
-    
-
-   // OnActorBeginOverlap.AddDynamic(this, &ATrapWind::OnOverlap);
-    //OnActorEndOverlap.AddDynamic(this, &ATrapWind::OnOverlapEnd);
 
 }
 
@@ -38,7 +33,7 @@ ATrapWind::ATrapWind()
 void ATrapWind::BeginPlay()
 {
 	Super::BeginPlay();
-    //GetWorld()->GetTimerManager().SetTimer(WindChangeTimer, this, &ATrapWind::ChangeDirection, ChangeCooldown, true);
+
     GetWorldTimerManager().SetTimer(TimerHandle_Change, this, &ATrapWind::ChangeDirection, ChangeCooldown, true);
 }
 
@@ -69,14 +64,10 @@ void ATrapWind::WindAction(float DeltaTime) {
 
             FVector WindForceVector = MyCharacter->GetActorLocation();
 
-            // Добавляем ветровую силу к персонажу
             WindForceVector += WindDirection * WindForce * DeltaTime;
 
             MyCharacter->SetActorLocation(WindForceVector);
             
-            
-
-            //MyCharacter->LaunchCharacter(WindDirection * WindForce, false, false);
         }
     }
     

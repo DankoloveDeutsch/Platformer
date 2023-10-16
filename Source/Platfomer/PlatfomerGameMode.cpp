@@ -45,12 +45,12 @@ void APlatfomerGameMode::Tick(float DeltaTime)
 		}
 	}
 }
-
+// Запустить обработку событий
 void APlatfomerGameMode::StartTick() {
 	bStopTick = false;
 	PlayerController->bShowMouseCursor = false;
 }
-
+// Метод смены пользовательского виджета
 void  APlatfomerGameMode::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass)
 {
 	if (CurrentWidget != nullptr)
@@ -71,18 +71,18 @@ void  APlatfomerGameMode::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetCla
 		}
 	}
 }
-
+// Вернуть текущее состояние игры
 EGamePlayState APlatfomerGameMode::GetCurrentState() const
 {
 	return CurrentState;
 }
-
+// Изменить состояние игры
 void APlatfomerGameMode::SetCurrentState(EGamePlayState NewState)
 {
 	CurrentState = NewState;
 	HandleNewState(CurrentState);
 }
-
+// Применить логику нового состояния игры, установленного SetCurrentState()
 void APlatfomerGameMode::HandleNewState(EGamePlayState NewState)
 {
 	switch (NewState)
@@ -123,15 +123,13 @@ void APlatfomerGameMode::HandleNewState(EGamePlayState NewState)
 	break;
 	}
 }
-
+// Вернуть значение таймера для отображения в пользовательском виджете
 float APlatfomerGameMode::GetTimer() {
 	return LevelTime;
 }
-\
-void APlatfomerGameMode::UpdateLevelTime()
-{
-	LevelTime += 0.01f; // Увеличьте время на 1 секунду
-	// Здесь вы можете обновить интерфейс с отображением времени
+
+void APlatfomerGameMode::UpdateLevelTime(){
+	LevelTime += 0.01f;
 }
 void  APlatfomerGameMode::StartTimer(){
 		GetWorldTimerManager().SetTimer(TimerHandle, this, &APlatfomerGameMode::UpdateLevelTime, 0.01f, true);

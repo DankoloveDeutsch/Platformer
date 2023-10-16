@@ -53,7 +53,9 @@ public:
 	UPROPERTY()
 	FVector WindDirection;
 
+	UFUNCTION()
 	void EnableWind();
+	UFUNCTION()
 	void DisableWind();
 
 	UFUNCTION()

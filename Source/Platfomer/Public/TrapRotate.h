@@ -22,11 +22,16 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* TrapMesh;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Trap")
 	UMaterialInterface* NormalMaterial;
+	
+	UFUNCTION()
 	void RotateTrap(float DeltaTime);
-
+	
+	UPROPERTY(EditAnywhere)
 	float  RotationSpeed;
 };

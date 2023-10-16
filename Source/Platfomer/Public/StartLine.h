@@ -26,9 +26,10 @@ public:
 	UStaticMeshComponent* StaticMeshComponent;
 
 	virtual void Tick(float DeltaTime) override;
+	
 	UPROPERTY(EditAnywhere)
-
 	APlatfomerGameMode* MyGameMode;
+	
 	UFUNCTION()
 	void OnStartLineEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 };

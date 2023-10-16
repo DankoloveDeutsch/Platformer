@@ -37,19 +37,23 @@ protected:
 	TSubclassOf<UUserWidget> MyHUDClass;
 
 	AMyHUD* HudWidget;
-	/** The widget instance that we are using as our menu. */
+
 	UPROPERTY()
 	UUserWidget* CurrentWidget;
 
 public:
 	APlatfomerGameMode();
-	APlayerController* PlayerController;
+
+	
 	virtual void BeginPlay() override;
 	
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere)
 	bool bStopTick;
+
 	APlatfomerCharacter* MyCharacter;
+	APlayerController* PlayerController;
 
 	UFUNCTION(BlueprintCallable, Category = "UMG Game")
 	void ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass);
@@ -59,7 +63,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	void StartTick();
-	/** Sets a new playing state */
+
 	void SetCurrentState(EGamePlayState NewState);
 
 	UPROPERTY(EditAnywhere)
@@ -76,10 +80,9 @@ public:
 
 	void StartTimer();
 private: 
-	/**Keeps track of the current playing state */
+
 	EGamePlayState CurrentState;
 
-	/**Handle any function calls that rely upon changing the playing state of our game */
 	void HandleNewState(EGamePlayState NewState);
 };
 
