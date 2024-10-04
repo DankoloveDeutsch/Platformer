@@ -9,15 +9,15 @@
 ATrapWind::ATrapWind()
 {
     PrimaryActorTick.bCanEverTick = true;
-    NormalMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/LevelPrototyping/Materials/TrapDamage/TrapDamage_Normal"));
-    ActivatedMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/LevelPrototyping/Materials/TrapDamage/TrapDamage_Activation"));
+    NormalMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/LevelPrototyping/Materials/Wind"));
+    ActivatedMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/LevelPrototyping/Materials/M_Solid"));
     WindChange = false;
 
     WindForce = 200.0f; 
     WindDirection = FVector(1.0f, 0.0f, 0.0f);
     ChangeCooldown = 2.0f;
 
-    UStaticMesh* TrapWind = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(), NULL, TEXT("/Game/LevelPrototyping/Meshes/Title")));
+    UStaticMesh* TrapWind = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(), NULL, TEXT("/Game/LevelPrototyping/Meshes/plate")));
 
     StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
     StaticMeshComponent->SetStaticMesh(TrapWind);
@@ -45,14 +45,14 @@ void ATrapWind::Tick(float DeltaTime)
     UE_LOG(LogTemp, Warning, TEXT("Im working TICK"));
 }
 
-// Функция смены направления ветра
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 void ATrapWind::ChangeDirection() {
 
     float RandomX = FMath::FRandRange(-1.0f, 1.0f);
     float RandomY = FMath::FRandRange(-1.0f, 1.0f);
     WindDirection = FVector(RandomX, RandomY, 0.0f).GetSafeNormal();
 }
-// Функция действия ветра
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 void ATrapWind::WindAction(float DeltaTime) {
     UE_LOG(LogTemp, Warning, TEXT("Im working"));
     if (WindChange)
@@ -73,19 +73,19 @@ void ATrapWind::WindAction(float DeltaTime) {
     
 
 }
-// Активация ветра
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 void ATrapWind::EnableWind()
 {
     WindChange = true;
     StaticMeshComponent->SetMaterial(0, ActivatedMaterial);
 }
-// Дезактивация ветра
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 void ATrapWind::DisableWind()
 {
     WindChange = false;
     StaticMeshComponent->SetMaterial(0, NormalMaterial);
 }
-// Начало взаимодействия с персонажем
+// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 void ATrapWind::OnTrapOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
     MyCharacter = Cast<APlatfomerCharacter>(OtherActor);
     if (MyCharacter)
@@ -93,7 +93,7 @@ void ATrapWind::OnTrapOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
         EnableWind();
     }
 }
-// Конец взаимодействия с персонажем
+// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 void ATrapWind::OnTrapEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
     
     MyCharacter = Cast<APlatfomerCharacter>(OtherActor);

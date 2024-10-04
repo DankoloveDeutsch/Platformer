@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "TrapRotate.h"
+#include "TrapRotateZ.h"
 
 // Sets default values
-ATrapRotate::ATrapRotate()
+ATrapRotateZ::ATrapRotateZ()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -23,22 +23,23 @@ ATrapRotate::ATrapRotate()
 }
 
 // Called when the game starts or when spawned
-void ATrapRotate::BeginPlay()
+void ATrapRotateZ::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
 // Called every frame
-void ATrapRotate::Tick(float DeltaTime)
+void ATrapRotateZ::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
     RotateTrap(DeltaTime);
 }
-void ATrapRotate::RotateTrap(float DeltaTime)
+void ATrapRotateZ::RotateTrap(float DeltaTime)
 {
     // �������� �������, ������� � ���� ��������
     FRotator NewRotation = GetActorRotation();
-    NewRotation.Yaw += RotationSpeed * DeltaTime; // RotationSpeed - �������� ��������
+    NewRotation.Roll += RotationSpeed * DeltaTime; // RotationSpeed - �������� ��������
     SetActorRotation(NewRotation);
 }
+

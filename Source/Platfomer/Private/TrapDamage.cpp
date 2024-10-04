@@ -2,26 +2,41 @@
 
 
 #include "TrapDamage.h"
-#include "Kismet/GameplayStatics.h"
-#include "TimerManager.h"
+
 // Sets default values
 ATrapDamage::ATrapDamage()
 {
 
-    DamageRate = 1.0f; // »нтервал между ударами в секундах
-    DamageAmount = 10.0f; //  оличество урона при каждом ударе
+    DamageRate = 1.0f; 
+    DamageAmount = 10.0f; 
     DamageColdawn = 5.0f;
 
     bCanInflictDamage = true;
 
-    UStaticMesh* SM_Vase = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(), NULL, TEXT("/Game/LevelPrototyping/Meshes/Title")));
-
     StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
-    StaticMeshComponent->SetStaticMesh(SM_Vase);
+    RootComponent = StaticMeshComponent;
 
-    NormalMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/LevelPrototyping/Materials/TrapDamage/TrapDamage_Normal"));; 
-    ActivatedMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/LevelPrototyping/Materials/TrapDamage/TrapDamage_Activation"));
-    DamageMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/LevelPrototyping/Materials/TrapDamage/TrapDamage_Damage"));
+    static ConstructorHelpers::FObjectFinder<UStaticMesh> SM_Asset(TEXT("/Game/LevelPrototyping/Meshes/plate"));
+    if (SM_Asset.Succeeded())
+    {
+        StaticMeshComponent->SetStaticMesh(SM_Asset.Object);
+    }
+
+    static ConstructorHelpers::FObjectFinder<UMaterialInterface> NormalMatAsset(TEXT("/Game/LevelPrototyping/Materials/TrapDamage/TrapDamage_Normal"));
+    if (NormalMatAsset.Succeeded())
+    {
+        NormalMaterial = NormalMatAsset.Object;
+    }
+    static ConstructorHelpers::FObjectFinder<UMaterialInterface> ActivatedMatAsset(TEXT("/Game/LevelPrototyping/Materials/TrapDamage/TrapDamage_Activation"));
+    if (ActivatedMatAsset.Succeeded())
+    {
+        ActivatedMaterial = ActivatedMatAsset.Object;
+    }
+    static ConstructorHelpers::FObjectFinder<UMaterialInterface> DamageMatAsset(TEXT("/Game/LevelPrototyping/Materials/TrapDamage/TrapDamage_Damage"));
+    if (DamageMatAsset.Succeeded())
+    {
+        DamageMaterial = DamageMatAsset.Object;
+    }
 
     StaticMeshComponent->SetMaterial(0, NormalMaterial);
     StaticMeshComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
@@ -47,9 +62,9 @@ void ATrapDamage::OnOverlap(AActor* MyOverlappedActor, AActor* OtherActor)
     if (OtherActor && OtherActor != this)
     {
         MyCharacter = Cast<APlatfomerCharacter>(OtherActor);
-        if (MyCharacter)
+        if (MyCharacter and !GetWorldTimerManager().IsTimerActive(TimerHandle_Damage))
         {
-            // ≈сли персонаж находитс€ на ловушке, установите таймер дл€ нанесени€ урона
+            //OverlappingCharacter = Cast<APlatfomerCharacter>(MyCharacter->GetWorld()->GetFirstPlayerController()->GetPawn());
             bCanInflictDamage = true;
             StaticMeshComponent->SetMaterial(0, ActivatedMaterial);
             GetWorldTimerManager().SetTimer(TimerHandle_Damage, this, &ATrapDamage::InflictDamage, DamageRate, true);

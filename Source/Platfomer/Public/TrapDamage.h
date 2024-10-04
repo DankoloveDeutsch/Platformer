@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "../PlatfomerCharacter.h"
+#include "Kismet/GameplayStatics.h"
+#include "TimerManager.h"
 #include "Components/StaticMeshComponent.h"
 #include "TrapDamage.generated.h"
 
@@ -29,36 +31,38 @@ public:
 	UStaticMeshComponent* StaticMeshComponent;
 
 	UPROPERTY(EditAnywhere)
-	bool bCanInflictDamage; // Можно ли нанести урон
+	bool bCanInflictDamage; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 
 	UPROPERTY(EditAnywhere)
-	float DamageRate; // Время активации ловушки до нанесения урона
+	float DamageRate; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	UPROPERTY(EditAnywhere)
-	float DamageAmount; // Количество урона при каждом ударе
+	float DamageAmount; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	UPROPERTY(EditAnywhere)
-	float DamageColdawn; // Время перезарядки ловушки
+	float DamageColdawn; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	UPROPERTY(EditAnywhere)
 	FTimerHandle TimerHandle_Damage;
 	UPROPERTY(EditAnywhere)
 	FTimerHandle TimerHandle_Reset;
 
-	// Нормальный материал объекта
+	//APlatfomerCharacter* OverlappingCharacter;
+	
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	UMaterialInterface* NormalMaterial;
 
-	// Цвет ловушки во время активации
+	// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	UMaterialInterface* ActivatedMaterial;
 
-	// Цвет ловушки во время нанесения урона и перезарядки
+	// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	UMaterialInterface* DamageMaterial;
 
 	UPROPERTY(EditAnywhere)
 	APlatfomerCharacter* MyCharacter;
 
 	UFUNCTION()
-	void InflictDamage(); // Функция нанесения урона ловушкой персонажу
+	void InflictDamage(); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 	UFUNCTION()
-	void ResetTrap(); // Функция перезарядки ловушки
+	void ResetTrap(); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 	UFUNCTION()
 	void OnOverlap(AActor* MyOverlappedActor, AActor* OtherActor);
