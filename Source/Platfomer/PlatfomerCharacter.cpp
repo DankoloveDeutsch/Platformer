@@ -11,12 +11,15 @@
 #include "InputActionValue.h"
 #include "Engine/LocalPlayer.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "PlatfomerGameMode.h"
+#include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
 // APlatfomerCharacter
+
 
 APlatfomerCharacter::APlatfomerCharacter()
 {
@@ -145,5 +148,14 @@ void APlatfomerCharacter::UpdateHealth(float HealthChange)
 		CurrentHealth += HealthChange;
 		CurrentHealth = FMath::Clamp(CurrentHealth, 0.0f, MaxHealth);
 		HealthPercentage = CurrentHealth / MaxHealth;
+		if (CurrentHealth <= 0)
+		{
+			APlatfomerGameMode* GameMode = Cast<APlatfomerGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+			if(GameMode)
+			{
+				OnGameOver.Broadcast(false);
+			}
+		}
+		OnHealthUpdated.Broadcast(CurrentHealth,MaxHealth);
 	}
 }

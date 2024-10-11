@@ -2,135 +2,110 @@
 
 #include "PlatfomerGameMode.h"
 #include "PlatfomerCharacter.h"
-#include "MyHUD.h"
+#include "GameHUD.h"
+#include "Trigger.h"
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Blueprint/UserWidget.h"
+#include "GameOver.h"
+
 #include "UObject/ConstructorHelpers.h"
 
 APlatfomerGameMode::APlatfomerGameMode()
-	: Super()
 {
 	// set default pawn class to our Blueprinted character
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/FirstPerson/Blueprints/BP_FirstPersonCharacter"));
-	DefaultPawnClass = PlayerPawnClassFinder.Class;
-	bStopTick = false;
-	PrimaryActorTick.bCanEverTick = true;
-	LevelTime = 0.0f;
+	if (PlayerPawnClassFinder.Class != NULL)
+	{
+		DefaultPawnClass = PlayerPawnClassFinder.Class;
+	}
+
+	PlayerHUDClass = nullptr;
+	PlayerHUD = nullptr;
+
+	GameOverHUDClass = nullptr;
+	GameOverHUD = nullptr;
 
 }
 void APlatfomerGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetCurrentState(EGamePlayState::EPlaying);
-	ChangeMenuWidget(MyHUDClass);
+	APlayerController* Controller = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (Controller)
+	{
+		APlatfomerCharacter* Player = Cast<APlatfomerCharacter>(Controller->GetPawn());
+		if (Player)
+		{
+			Player->OnGameOver.AddDynamic(this,&APlatfomerGameMode::GameOver);
+		}
+	}
 
-	MyCharacter = Cast<APlatfomerCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));
+	TArray<AActor*> Triggers;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(),ATrigger::StaticClass(),Triggers);
+	for (AActor* Actor : Triggers)
+	{
+		ATrigger* Trigger = Cast<ATrigger>(Actor);
+		if(Trigger && Trigger->ActorHasTag("Win") || Trigger->ActorHasTag("Lose"))
+		{
+			Trigger->OnGameOver.AddDynamic(this,&APlatfomerGameMode::GameOver);
+		}
+		else if (Trigger && Trigger->ActorHasTag("Start"))
+		{
+			Trigger->OnStart.AddDynamic(this,&APlatfomerGameMode::SetGameStartTime);
+		}
+	}
+
+	if(PlayerHUDClass)
+	{
+		APlayerController* FPC = UGameplayStatics::GetPlayerController(GetWorld(),0);
+		check(FPC);
+		PlayerHUD = CreateWidget<UGameHUD>(FPC, PlayerHUDClass);
+		check(PlayerHUD);
+		PlayerHUD->AddToPlayerScreen();
+
+	}
+	
 }
 
 void APlatfomerGameMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (bStopTick)
-	{
-		
-		return;
-	};
-
-	if (MyCharacter)
-	{
-		if (MyCharacter->GetHealth()<=0.0f || MyCharacter->GetActorLocation().Z<= -100.0f)
-		{
-			SetCurrentState(EGamePlayState::EGameOver);
-		}
-	}
-}
-// Запустить обработку событий
-void APlatfomerGameMode::StartTick() {
-	bStopTick = false;
-	PlayerController->bShowMouseCursor = false;
-}
-// Метод смены пользовательского виджета
-void  APlatfomerGameMode::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass)
-{
-	if (CurrentWidget != nullptr)
-	{
-		CurrentWidget->RemoveFromViewport();
-
-		CurrentWidget = nullptr;
-	}
-	if (NewWidgetClass != nullptr)
-	{
-
-		CurrentWidget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), NewWidgetClass);
-
-		if (CurrentWidget != nullptr)
-		{
-			CurrentWidget->AddToViewport();
-			
-		}
-	}
-}
-// Вернуть текущее состояние игры
-EGamePlayState APlatfomerGameMode::GetCurrentState() const
-{
-	return CurrentState;
-}
-// Изменить состояние игры
-void APlatfomerGameMode::SetCurrentState(EGamePlayState NewState)
-{
-	CurrentState = NewState;
-	HandleNewState(CurrentState);
-}
-// Применить логику нового состояния игры, установленного SetCurrentState()
-void APlatfomerGameMode::HandleNewState(EGamePlayState NewState)
-{
-	switch (NewState)
-	{
-	case EGamePlayState::EPlaying:
-	{
-	}
-	break;
-	// Unknown/default state
-	case EGamePlayState::EGameOver:
-	{
-		bStopTick = true;
-		ChangeMenuWidget(LoserWidgetClass);
-		GetWorldTimerManager().ClearTimer(TimerHandle);
-
-		UWorld* World = GetWorld();
-
-		PlayerController = World->GetFirstPlayerController();
 	
-		PlayerController->bShowMouseCursor = true;
+}
 
-		
-	}
-	break;
-	default:
-	case EGamePlayState::EWin:
+void  APlatfomerGameMode::GameOver(bool bWonGame)
+{
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(),0);
+	if (PlayerController)
 	{
-		bStopTick = true;
-		ChangeMenuWidget(WinnerWidgetClass);
-		GetWorldTimerManager().ClearTimer(TimerHandle);
-
-		UWorld* World = GetWorld();
-
-		PlayerController = World->GetFirstPlayerController();
-
 		PlayerController->bShowMouseCursor = true;
+		PlayerController->bEnableClickEvents = true;
+		PlayerController->SetInputMode(FInputModeUIOnly());
+		GameEndTime = UGameplayStatics::GetRealTimeSeconds(GetWorld());
+		
+		if (GameOverHUDClass)
+		{
+			GameOverHUD = CreateWidget<UGameOver>(GetWorld(),GameOverHUDClass);
+			check(GameOverHUD);
+
+			UGameplayStatics::SetGamePaused(GetWorld(),true);
+			
+			GameOverHUD->AddToPlayerScreen();
+			
+			GameOverHUD->SetGameDuration(GameStartTime,GameEndTime);
+			GameOverHUD->SetWinLose(bWonGame);
+		}
 	}
-	break;
-	}
-}
-// Вернуть значение таймера для отображения в пользовательском виджете
-float APlatfomerGameMode::GetTimer() {
-	return LevelTime;
 }
 
-void APlatfomerGameMode::UpdateLevelTime(){
-	LevelTime += 0.01f;
+
+void APlatfomerGameMode::SetGameStartTime(double time)
+{
+	GameStartTime = time;
 }
-void  APlatfomerGameMode::StartTimer(){
-		GetWorldTimerManager().SetTimer(TimerHandle, this, &APlatfomerGameMode::UpdateLevelTime, 0.01f, true);
+
+void APlatfomerGameMode::DeleteHUD()
+{
+	GameOverHUD->SetVisibility(ESlateVisibility::Hidden);
 }

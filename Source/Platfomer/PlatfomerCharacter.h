@@ -18,6 +18,10 @@ struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHealthUpdateFromCharacterDelegate, float, UpdHealth, float, UpdMaxHealth);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGameOverFromCharacterDelegate, bool, bWinLose);
+
+
 UCLASS(config=Game)
 class APlatfomerCharacter : public ACharacter
 {
@@ -89,7 +93,7 @@ public:
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
-	float MaxHealth;
+	float MaxHealth = 100.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float CurrentHealth;
@@ -102,6 +106,15 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	void UpdateHealth(float HealthChange);
+
+	UPROPERTY(BlueprintAssignable)
+	FHealthUpdateFromCharacterDelegate OnHealthUpdated;
+
+	UPROPERTY(BlueprintAssignable)
+	FGameOverFromCharacterDelegate OnGameOver;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	class UWidgetComponent* WidgetComponent;
 
 };
 

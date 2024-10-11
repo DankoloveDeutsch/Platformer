@@ -5,41 +5,18 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "PlatfomerCharacter.h"
-#include "MyHUD.h"
+#include "public/MyHUD.h"
 #include "PlatfomerPlayerController.h"
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/PlayerController.h"
 #include "PlatfomerGameMode.generated.h"
 
-UENUM()
-enum class EGamePlayState
-{
-	ENewGame,
-	EPlaying,
-	EGameOver,
-	EWin
-};
 
 UCLASS(minimalapi)
 class APlatfomerGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 protected:
-
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG Game")
-	TSubclassOf<UUserWidget> WinnerWidgetClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG Game")
-	TSubclassOf<UUserWidget> LoserWidgetClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG Game")
-	TSubclassOf<UUserWidget> MyHUDClass;
-
-	AMyHUD* HudWidget;
-
-	UPROPERTY()
-	UUserWidget* CurrentWidget;
 
 public:
 	APlatfomerGameMode();
@@ -48,42 +25,33 @@ public:
 	virtual void BeginPlay() override;
 	
 	virtual void Tick(float DeltaTime) override;
+	
+	UFUNCTION(BlueprintCallable)
+	void GameOver(bool bWonGame);
 
-	UPROPERTY(EditAnywhere)
-	bool bStopTick;
+	UPROPERTY(BlueprintReadOnly)
+	double GameStartTime;
 
-	APlatfomerCharacter* MyCharacter;
-	APlayerController* PlayerController;
+	UFUNCTION()
+	void SetGameStartTime(double time);
 
-	UFUNCTION(BlueprintCallable, Category = "UMG Game")
-	void ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass);
+	UPROPERTY(BlueprintReadOnly)
+	double GameEndTime;
 
-	UFUNCTION(BlueprintPure, Category = "Health")
-	EGamePlayState GetCurrentState() const;
+	UPROPERTY(EditAnywhere, Category="UI")
+	TSubclassOf<class UGameHUD> PlayerHUDClass;
+	UPROPERTY()
+	UGameHUD* PlayerHUD;
 
-	UFUNCTION(BlueprintCallable, Category = "Health")
-	void StartTick();
 
-	void SetCurrentState(EGamePlayState NewState);
+	UPROPERTY(EditAnywhere, Category="UI")
+	TSubclassOf<class UGameOver> GameOverHUDClass;
 
-	UPROPERTY(EditAnywhere)
-	FTimerHandle TimerHandle; // Таймер прохождения
+	UPROPERTY()
+	UGameOver* GameOverHUD;
 
-	UFUNCTION(BlueprintCallable, Category = "Timer")
-	float GetTimer();
+	void DeleteHUD();
 
-	UFUNCTION(BlueprintCallable, Category = "Timer")
-	void UpdateLevelTime();
-
-	UPROPERTY(EditAnywhere)
-	float LevelTime;
-
-	void StartTimer();
-private: 
-
-	EGamePlayState CurrentState;
-
-	void HandleNewState(EGamePlayState NewState);
 };
 
 
